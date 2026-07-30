@@ -1,0 +1,17 @@
+# Dependencias (si en algún momento se usa un paso de build)
+node_modules/
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuración local / entornos que no deben compartirse
+.env
+.env.local
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+*.log

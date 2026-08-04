@@ -17,11 +17,6 @@
 </head>
 <body>
 
-  <!-- Mono de fondo con parallax (decorativo) -->
-  <div class="parallax-mono" aria-hidden="true">
-    <img src="assets/logo/bigwhite.webp" alt="" width="1024" height="1024" decoding="async">
-  </div>
-
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a href="#hero" class="nav__brand" aria-label="mono azul — inicio">
@@ -61,8 +56,15 @@
           </div>
         </div>
         <div class="hero__figure">
-          <img src="assets/logo/bigblack.webp" alt="Silueta del mono de mono azul"
-               width="1024" height="1024" fetchpriority="high" decoding="async">
+          <!-- Dos capas superpuestas: el crossfade anima la opacidad de una
+               contra la otra, nunca display. El contenedor lleva la etiqueta
+               accesible; las capas son decorativas. -->
+          <div class="hero__mono" id="heroMono" role="img" aria-label="Silueta del mono de mono azul">
+            <img class="hero__mono-layer is-active" src="assets/logo/bigblack.webp" alt="" aria-hidden="true"
+                 width="1024" height="1024" fetchpriority="high" decoding="async">
+            <img class="hero__mono-layer" src="assets/logo/bigblack.webp" alt="" aria-hidden="true"
+                 width="1024" height="1024" decoding="async">
+          </div>
         </div>
       </div>
     </section>
@@ -84,9 +86,10 @@
       <div class="container">
         <div class="reveal">
           <p class="section__kicker">Servicios</p>
-          <h2 class="section__title">Agendas de contenido listas para publicar</h2>
+          <h2 class="section__title section__title--xl">Agendas de contenido listas para publicar</h2>
           <p class="section__lead">Tú subes el material, nosotros hacemos el resto: diseñamos cada carrusel, escribimos el copy de venta con hashtags y te indicamos el día ideal de publicación. Tu parrilla del mes, resuelta.</p>
         </div>
+        <div class="planes-carousel" id="planesCarousel">
         <div class="planes">
           <article class="plan reveal">
             <h3 class="plan__name">Estándar</h3>
@@ -100,7 +103,7 @@
             <a class="btn btn--outline" href="https://wa.me/573204655811?text=Hola%2C%20me%20interesa%20el%20plan%20Est%C3%A1ndar" target="_blank" rel="noopener">Empezar con Estándar</a>
           </article>
 
-          <article class="plan plan--featured reveal">
+          <article class="plan plan--featured reveal" style="--d:.1s">
             <p class="plan__badge">Más popular</p>
             <h3 class="plan__name">Premium</h3>
             <p class="plan__price">$800.000 <span>COP / mes</span></p>
@@ -114,7 +117,7 @@
             <a class="btn btn--whatsapp" href="https://wa.me/573204655811?text=Hola%2C%20me%20interesa%20el%20plan%20Premium" target="_blank" rel="noopener">Empezar con Premium</a>
           </article>
 
-          <article class="plan reveal">
+          <article class="plan reveal" style="--d:.2s">
             <h3 class="plan__name">Elite</h3>
             <p class="plan__price">$1.100.000 <span>COP / mes</span></p>
             <ul class="plan__features">
@@ -127,6 +130,7 @@
             </ul>
             <a class="btn btn--outline" href="https://wa.me/573204655811?text=Hola%2C%20me%20interesa%20el%20plan%20Elite" target="_blank" rel="noopener">Empezar con Elite</a>
           </article>
+        </div>
         </div>
       </div>
     </section>
@@ -149,33 +153,47 @@
       </div>
     </section>
 
-    <!-- PORTAFOLIO -->
-    <section class="section--tint galeria-section" id="portafolio">
-      <div class="galeria-pin" id="galeriaPin">
-        <div class="galeria-sticky">
-          <div class="container">
-            <div class="reveal">
-              <p class="section__kicker">Portafolio</p>
-              <h2 class="section__title">Contenido real, publicado y funcionando</h2>
-              <p class="section__lead">Piezas diseñadas por nosotros, ya publicadas en las cuentas de nuestros clientes.</p>
-            </div>
-          </div>
-          <div class="galeria-viewport" id="galeriaViewport">
-            <div class="galeria-track" id="galeriaTrack">
-              <figure class="galeria__item">
-                <img src="assets/portafolio/p1.webp" alt="Publicación de Instagram de Salitre Mágico: carrusel MAXIcombos Pasaportes Nitro" width="720" height="1510" loading="lazy" decoding="async">
-                <figcaption>Salitre Mágico</figcaption>
-              </figure>
-              <figure class="galeria__item">
-                <img src="assets/portafolio/p2.webp" alt="Publicación de Instagram de By Reeld's: carrusel de Cream Delicious, snacks para gatos" width="720" height="1510" loading="lazy" decoding="async">
-                <figcaption>By Reeld's</figcaption>
-              </figure>
-              <figure class="galeria__item">
-                <img src="assets/portafolio/p3.webp" alt="Publicación de Instagram de By Reeld's: carrusel de Ronik, nutrición premium para gatos" width="720" height="1510" loading="lazy" decoding="async">
-                <figcaption>By Reeld's</figcaption>
-              </figure>
-            </div>
-          </div>
+    <!-- MARCAS (marquee ligado al scroll) -->
+    <section class="marquee-section" id="marcas" aria-label="Marcas con las que ha trabajado nuestro equipo">
+      <div class="container reveal">
+        <p class="section__kicker">Experiencia</p>
+        <h2 class="section__title">Marcas con las que hemos trabajado</h2>
+      </div>
+      <div class="marquee" id="marquee">
+        <div class="marquee__row">
+          <span>Motul</span><span class="is-outline">Salitre Mágico</span><span>Movistar</span><span class="is-outline">By Reeld's</span>
+          <span aria-hidden="true">Motul</span><span class="is-outline" aria-hidden="true">Salitre Mágico</span><span aria-hidden="true">Movistar</span><span class="is-outline" aria-hidden="true">By Reeld's</span>
+          <span aria-hidden="true">Motul</span><span class="is-outline" aria-hidden="true">Salitre Mágico</span><span aria-hidden="true">Movistar</span><span class="is-outline" aria-hidden="true">By Reeld's</span>
+        </div>
+        <div class="marquee__row marquee__row--reverse" aria-hidden="true">
+          <span class="is-outline">Movistar</span><span>By Reeld's</span><span class="is-outline">Motul</span><span>Salitre Mágico</span>
+          <span class="is-outline">Movistar</span><span>By Reeld's</span><span class="is-outline">Motul</span><span>Salitre Mágico</span>
+          <span class="is-outline">Movistar</span><span>By Reeld's</span><span class="is-outline">Motul</span><span>Salitre Mágico</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTAFOLIO (tarjetas que se apilan con el scroll) -->
+    <section class="section section--tint" id="portafolio">
+      <div class="container">
+        <div class="reveal">
+          <p class="section__kicker">Portafolio</p>
+          <h2 class="section__title">Contenido real, publicado y funcionando</h2>
+          <p class="section__lead">Piezas diseñadas por nosotros, ya publicadas en las cuentas de nuestros clientes.</p>
+        </div>
+        <div class="stack" id="stack">
+          <figure class="stack-card" style="--i:0">
+            <img src="assets/portafolio/p1.webp" alt="Publicación de Instagram de Salitre Mágico: carrusel MAXIcombos Pasaportes Nitro" width="720" height="1510" loading="lazy" decoding="async">
+            <figcaption>Salitre Mágico</figcaption>
+          </figure>
+          <figure class="stack-card" style="--i:1">
+            <img src="assets/portafolio/p2.webp" alt="Publicación de Instagram de By Reeld's: carrusel de Cream Delicious, snacks para gatos" width="720" height="1510" loading="lazy" decoding="async">
+            <figcaption>By Reeld's</figcaption>
+          </figure>
+          <figure class="stack-card" style="--i:2">
+            <img src="assets/portafolio/p3.webp" alt="Publicación de Instagram de By Reeld's: carrusel de Ronik, nutrición premium para gatos" width="720" height="1510" loading="lazy" decoding="async">
+            <figcaption>By Reeld's</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -185,7 +203,7 @@
       <div class="container">
         <div class="reveal">
           <p class="section__kicker">Cómo trabajamos</p>
-          <h2 class="section__title">Un proceso simple, pensado para <em class="title-accent">resultados</em></h2>
+          <h2 class="section__title section__title--xl">Un proceso simple, pensado para <em class="title-accent">resultados</em></h2>
         </div>
         <ol class="pasos">
           <li class="paso reveal">

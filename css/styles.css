@@ -57,7 +57,7 @@ section[id] { scroll-margin-top: var(--nav-h); }
 }
 
 @keyframes reveal-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(30px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -65,25 +65,6 @@ section[id] { scroll-margin-top: var(--nav-h); }
   .reveal.is-visible { animation: none; }
 }
 
-/* ---------- Mono parallax de fondo ---------- */
-.parallax-mono {
-  position: fixed;
-  top: -10vh;
-  right: -8vw;
-  width: min(70vw, 640px);
-  z-index: 0;
-  opacity: 0.055;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.parallax-mono img { width: 100%; height: auto; }
-
-@media (prefers-reduced-motion: reduce) {
-  .parallax-mono { display: none; }
-}
-
-/* El contenido siempre por encima del mono */
 .nav, main, .footer { position: relative; z-index: 1; }
 
 /* ---------- Nav (tema claro sobre el hero, oscuro al scrollear) ---------- */
@@ -317,14 +298,22 @@ section[id] { scroll-margin-top: var(--nav-h); }
 }
 
 .hero__title {
-  font-size: clamp(2.9rem, 10.5vw, 5.4rem);
+  font-size: clamp(2.9rem, 11vw, 7.5rem);
   font-weight: 700;
-  color: var(--bg);
   letter-spacing: -0.02em;
   line-height: 1.02;
+  background: linear-gradient(135deg, var(--bg) 30%, rgba(11, 15, 26, 0.55));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.hero__title span { color: var(--accent); }
+.hero__title span {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 .hero__eyebrow {
   margin-top: 1.6rem;
@@ -353,42 +342,72 @@ section[id] { scroll-margin-top: var(--nav-h); }
   border-radius: 50%;
   background: var(--accent);
   color: var(--white);
-  transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
-              background 0.25s ease-out,
-              box-shadow 0.25s ease-out;
+  transition: transform 0.22s ease-out,
+              background 0.22s ease-out,
+              box-shadow 0.22s ease-out;
 }
 
 .btn-arrow:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px) scale(1.06);
+  transform: scale(1.05);
   box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
 }
 
-.btn-arrow:active { transform: scale(0.95); }
+.btn-arrow:active { transform: scale(0.97); }
 
+/* Botones del hero: hover directo (solo escala + sombra), misma curva
+   ease-out al entrar y al salir, sin desplazamiento ni rebote. */
 .btn--wsp-hero {
   color: var(--bg);
   border: 1.5px solid rgba(11, 15, 26, 0.2);
+  transition: transform 0.22s ease-out,
+              background 0.22s ease-out,
+              box-shadow 0.22s ease-out,
+              border-color 0.22s ease-out,
+              color 0.22s ease-out;
 }
 
-.btn--wsp-hero svg { color: #1eb855; }
-
 .btn--wsp-hero:hover {
+  transform: scale(1.04);
   border-color: var(--whatsapp);
   box-shadow: 0 10px 32px rgba(37, 211, 102, 0.25);
 }
+
+.btn--wsp-hero svg { color: #1eb855; }
 
 .hero__figure {
   display: flex;
   justify-content: flex-end;
 }
 
-.hero__figure img {
+/* Contenedor del mono: define el tamaño; las capas se apilan dentro. */
+.hero__mono {
+  /* Única fuente de verdad: el JS lee este valor para marcar el ritmo de la
+     secuencia. Ajustar aquí cambia fundido y cadencia a la vez. */
+  --mono-fade: 300ms;
+  position: relative;
   width: min(72vw, 340px);
-  height: auto;
   aspect-ratio: 1;
   margin-right: -6vw;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Crossfade: solo se anima opacity, nunca display. */
+.hero__mono-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--mono-fade, 300ms) ease-in-out;
   filter: drop-shadow(0 24px 50px rgba(11, 15, 26, 0.18));
+}
+
+.hero__mono-layer.is-active { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__mono-layer { transition: none; }
 }
 
 @media (min-width: 820px) {
@@ -396,11 +415,50 @@ section[id] { scroll-margin-top: var(--nav-h); }
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 3rem;
+    gap: 0rem;
   }
-  .hero__figure img {
+  .hero__mono {
     width: min(40vw, 520px);
     margin-right: -4vw;
+  }
+}
+
+/* ---------- Hero en una sola columna (mobile/tablet) ----------
+   El orden pasa a titular → subtítulo → mono → botones, con el mono más
+   pequeño para que no domine la pantalla. `display: contents` disuelve
+   .hero__content y sube sus hijos a items de .hero__inner: es lo que permite
+   intercalar el mono entre el subtítulo y los botones con `order`, ya que
+   `order` solo ordena hermanos del mismo contenedor flex.
+   El espaciado se lleva con márgenes explícitos (gap: 0) porque cada par de
+   bloques pide un aire distinto. */
+@media (max-width: 819.98px) {
+  .hero__inner { gap: 0; text-align: center; }
+
+  .hero__content { display: contents; }
+
+  .hero__title { order: 1; }
+
+  .hero__eyebrow {
+    order: 2;
+    margin-top: 1.4rem;
+  }
+
+  .hero__figure {
+    order: 3;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .hero__actions {
+    order: 4;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem; /* separa los botones del borde inferior del hero */
+    justify-content: center;
+  }
+
+  .hero__mono {
+    width: min(46vw, 220px); /* ~64% del tamaño anterior (min(72vw, 340px)) */
+    margin-right: 0;         /* centrado: ya no se desborda hacia la derecha */
   }
 }
 
@@ -408,14 +466,16 @@ section[id] { scroll-margin-top: var(--nav-h); }
 .hero__title { animation: reveal-up 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
 .hero__eyebrow { animation: reveal-up 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s both; }
 .hero__actions { animation: reveal-up 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.3s both; }
-.hero__figure img { animation: hero-logo-in 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s both; }
+/* La entrada va en el contenedor, no en las capas: hero-logo-in anima
+   opacity y chocaría con el crossfade. */
+.hero__mono { animation: hero-logo-in 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s both; }
 
 @keyframes hero-logo-in {
   from { opacity: 0; transform: scale(0.9); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__title, .hero__eyebrow, .hero__actions, .hero__figure img { animation: none; }
+  .hero__title, .hero__eyebrow, .hero__actions, .hero__mono { animation: none; }
 }
 
 /* ---------- Secciones ---------- */
@@ -442,6 +502,25 @@ section[id] { scroll-margin-top: var(--nav-h); }
   font-weight: 700;
   line-height: 1.2;
   max-width: 22ch;
+}
+
+/* Título protagonista: gigante y con gradiente (clip en el texto) */
+.section__title--xl {
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  max-width: 16ch;
+  background: linear-gradient(135deg, var(--white) 35%, rgba(214, 214, 214, 0.5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section__title--xl .title-accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .section__lead {
@@ -573,93 +652,245 @@ section[id] { scroll-margin-top: var(--nav-h); }
   }
 }
 
-/* ---------- Portafolio (carrusel scroll-linked) ----------
-   .galeria-pin recibe altura extra por JS; .galeria-sticky queda fija
-   mientras el track se desliza en horizontal con translateX.
-   Sin JS (o con reduced-motion) el track es scrolleable en horizontal. */
-.galeria-pin { position: relative; }
+/* ---------- Carrusel de planes (solo mobile/tablet) ----------
+   Por debajo del breakpoint de 3 columnas, las tarjetas se apilan en un
+   plano tipo "coverflow": la activa nítida al centro y las laterales con
+   blur, escala y opacidad reducidas. Todo vive dentro de este media query,
+   así que el grid de desktop queda intacto. Las flechas y los puntos los
+   inyecta el JS solo en mobile, por lo que en desktop no existen ni en el DOM. */
+@media (max-width: 819.98px) {
+  .planes-carousel {
+    position: relative;
+  }
 
-.galeria-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2rem;
-  padding-top: var(--nav-h);
-  padding-bottom: 1.5rem;
+  /* La altura la fija el JS al alto de la tarjeta más alta: como las
+     tarjetas salen del flujo, el contenedor no puede calcularla solo. */
+  .planes.is-carousel {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    touch-action: pan-y; /* deja pasar el scroll vertical; el swipe lo maneja el JS */
+    margin-top: 3rem;    /* aire para el badge "Más popular" */
+  }
+
+  /* El transform se compone de custom properties para que el hover pueda
+     sumar su zoom sin pisar el desplazamiento lateral del carrusel. */
+  .planes.is-carousel .plan {
+    --cx: 0%;
+    --cy: 0px;
+    --cs: 1;
+    --cblur: 0;
+    --cop: 1;
+    position: absolute;
+    top: 16px; /* el badge sobresale -13px; sin este margen lo recorta el overflow */
+    left: 50%;
+    width: min(300px, 78%);
+    transform: translateX(-50%) translateX(var(--cx)) translateY(var(--cy)) scale(var(--cs));
+    filter: blur(calc(var(--cblur) * 1px));
+    opacity: var(--cop);
+    transition:
+      transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      filter 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s ease-out;
+  }
+
+  /* .reveal ya no gana en especificidad frente a la regla de arriba, así que
+     el fundido de entrada se restituye explícitamente. */
+  .planes.is-carousel .plan.reveal:not(.is-visible) { opacity: 0; }
+
+  .planes.is-carousel .plan.is-prev,
+  .planes.is-carousel .plan.is-next {
+    --cs: 0.78;
+    --cblur: 3;
+    --cop: 0.55;
+    cursor: pointer;
+  }
+
+  .planes.is-carousel .plan.is-prev { --cx: -62%; }
+  .planes.is-carousel .plan.is-next { --cx: 62%; }
+
+  .planes.is-carousel .plan.is-active { z-index: 2; }
+
+  /* Hover conservado: mismos valores que .plan:hover, expresados como vars
+     para no perder el centrado. */
+  .planes.is-carousel .plan.is-active:hover {
+    --cs: 1.025;
+    --cy: -4px;
+    box-shadow: 0 0 40px rgba(37, 99, 235, 0.35);
+  }
+
+  .planes.is-carousel .plan.is-prev:focus-visible,
+  .planes.is-carousel .plan.is-next:focus-visible {
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 3px;
+  }
+
+  .planes-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 242, 242, 0.14);
+    background: rgba(20, 33, 61, 0.8);
+    color: var(--white);
+    cursor: pointer;
+    transition: background 0.2s ease-out, border-color 0.2s ease-out;
+  }
+
+  .planes-nav:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .planes-nav:focus-visible {
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 3px;
+  }
+
+  .planes-nav svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .planes-nav--prev { left: 2px; }
+  .planes-nav--next { right: 2px; }
+
+  .planes-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+  }
+
+  .planes-dot {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(242, 242, 242, 0.25);
+    cursor: pointer;
+    transition: background 0.3s ease-out, width 0.3s ease-out;
+  }
+
+  .planes-dot.is-active {
+    width: 24px;
+    background: var(--accent);
+  }
+
+  .planes-dot:focus-visible {
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .planes.is-carousel .plan,
+    .planes-dot {
+      transition: none;
+    }
+  }
+}
+
+/* ---------- Marquee de marcas (ligado al scroll) ----------
+   Dos filas de nombres: la superior se desplaza hacia la derecha y la
+   inferior hacia la izquierda según window.scrollY (JS). Las filas
+   arrancan pre-desplazadas para que el movimiento no deje huecos. */
+.marquee-section {
+  padding: 4.5rem 0 3rem;
   overflow: hidden;
 }
 
-.galeria-viewport {
-  --card-w: min(72vw, 340px);
-  overflow-x: auto;
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
-  /* la primera tarjeta arranca centrada; el recorrido termina con la última centrada */
-  padding-inline: calc(50vw - var(--card-w) / 2);
+.marquee {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 0.5rem;
 }
 
-.galeria-viewport::-webkit-scrollbar { display: none; }
-
-.galeria-section.is-linked .galeria-viewport {
-  overflow: hidden;
-  scroll-snap-type: none;
-  padding-inline: 0;
-}
-
-.galeria-track {
+.marquee__row {
   display: flex;
-  gap: 1.5rem;
+  gap: 3rem;
   width: max-content;
-}
-
-/* Modo diapositiva: una imagen centrada; cada slide se posiciona
-   con su propio translateX calculado por JS según su índice. */
-.galeria-section.is-linked .galeria-track {
-  display: block;
-  position: relative;
-  width: var(--card-w);
-  margin-inline: auto;
-}
-
-.galeria-section.is-linked .galeria__item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  margin-left: -40%;
   will-change: transform;
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--white);
+  opacity: 0.9;
 }
 
-.galeria__item {
-  flex: 0 0 auto;
-  width: var(--card-w, min(72vw, 340px));
+.marquee__row .is-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(214, 214, 214, 0.4);
+}
+
+.marquee__row--reverse { margin-left: -10%; }
+
+/* ---------- Concepto: revelado carácter por carácter ---------- */
+.concepto__text .char {
+  opacity: 0.2;
+  transition: opacity 0.35s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concepto__text .char { opacity: 1; }
+}
+
+/* ---------- Portafolio (tarjetas que se apilan con el scroll) ----------
+   Cada tarjeta es sticky con un offset creciente (--i). Al subir la
+   siguiente, el JS reduce la escala de la anterior y la oscurece
+   (overlay ::after con --dim). Sin JS queda el apilado sticky simple. */
+.stack {
+  margin-top: 2.5rem;
+  max-width: 420px;
+  margin-inline: auto;
+  display: grid;
+  gap: 3rem;
+}
+
+.stack-card {
+  position: sticky;
+  top: calc(var(--nav-h) + 1.25rem + var(--i, 0) * 1.5rem);
   margin: 0;
   border-radius: 22px;
   overflow: hidden;
   border: 1px solid rgba(242, 242, 242, 0.1);
   background: var(--bg-2);
-  scroll-snap-align: center;
+  transform-origin: center top;
+  will-change: transform;
 }
 
-@media (max-height: 760px) {
-  .galeria-viewport { --card-w: min(72vw, 270px); }
+.stack-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: var(--dim, 0);
+  pointer-events: none;
 }
 
-.galeria__item img {
+.stack-card img {
   width: 100%;
-  aspect-ratio: 720 / 1510; /* reserva el espacio antes de cargar (sin CLS) */
+  height: min(58vh, 560px);
   object-fit: cover;
+  object-position: top center;
 }
 
-.galeria__item figcaption {
+.stack-card figcaption {
   padding: 0.75rem 1rem;
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--cream);
   border-top: 1px solid rgba(242, 242, 242, 0.08);
+  background: var(--bg-2);
+  position: relative;
 }
 
 /* ---------- Lo que necesitamos de ti ---------- */

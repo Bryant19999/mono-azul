@@ -160,23 +160,27 @@
   var stackVisible = false;
   var fxTicking = false;
 
-  /* Envuelve cada carácter de los párrafos del concepto en un span,
-     preservando el texto original en aria-label para lectores. */
+  /* Envuelve cada carácter de los párrafos del concepto en un span. Los
+     lectores de pantalla leen una copia íntegra en .sr-only; la versión
+     letra por letra es solo visual y va en un contenedor aria-hidden. */
   function splitConceptoChars() {
     conceptoParas.forEach(function (p) {
       var text = p.textContent;
-      p.setAttribute('aria-label', text);
-      var frag = document.createDocumentFragment();
+      var srText = document.createElement('span');
+      srText.className = 'sr-only';
+      srText.textContent = text;
+      var visual = document.createElement('span');
+      visual.setAttribute('aria-hidden', 'true');
       for (var i = 0; i < text.length; i++) {
         var s = document.createElement('span');
         s.className = 'char';
-        s.setAttribute('aria-hidden', 'true');
         s.textContent = text[i];
-        frag.appendChild(s);
+        visual.appendChild(s);
         conceptoChars.push(s);
       }
       p.textContent = '';
-      p.appendChild(frag);
+      p.appendChild(srText);
+      p.appendChild(visual);
     });
   }
 

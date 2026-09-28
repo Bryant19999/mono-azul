@@ -321,7 +321,7 @@ section[id] { scroll-margin-top: var(--nav-h); }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.34em;
-  color: rgba(11, 15, 26, 0.55);
+  color: rgba(11, 15, 26, 0.65); /* 5.7:1 sobre --white (WCAG AA) */
 }
 
 .hero__actions {
@@ -505,6 +505,9 @@ section[id] { scroll-margin-top: var(--nav-h); }
 }
 
 /* Título protagonista: gigante y con gradiente (clip en el texto) */
+/* Títulos largos: más ancho para no partir en demasiadas líneas */
+.section__title--wide { max-width: 32ch; }
+
 .section__title--xl {
   font-size: clamp(2.4rem, 8vw, 5.5rem);
   line-height: 1.02;
@@ -605,6 +608,12 @@ section[id] { scroll-margin-top: var(--nav-h); }
 .plan__price span {
   font-size: 0.9rem;
   font-weight: 500;
+  color: var(--gray);
+}
+
+.plan__tax {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
   color: var(--gray);
 }
 
@@ -834,6 +843,19 @@ section[id] { scroll-margin-top: var(--nav-h); }
 .marquee__row--reverse { margin-left: -10%; }
 
 /* ---------- Concepto: revelado carácter por carácter ---------- */
+/* Oculto a la vista pero leído por lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .concepto__text .char {
   opacity: 0.2;
   transition: opacity 0.35s ease-out;
@@ -1066,6 +1088,6 @@ section[id] { scroll-margin-top: var(--nav-h); }
 
 .footer__legal {
   font-size: 0.8rem;
-  color: rgba(214, 214, 214, 0.5);
+  color: rgba(214, 214, 214, 0.6); /* 5.3:1 sobre --bg (WCAG AA) */
 }
 
